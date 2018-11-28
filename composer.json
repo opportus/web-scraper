@@ -1,0 +1,21 @@
+{
+    "name": "opportus/web-scraper",
+    "description": "A web scraper taking as arguments a list of URLs and a list of XPath queries to perform on each document.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "opportus",
+            "email": "opportus@gmail.com"
+        }
+    ],
+    "require": {
+		"php": "^7.2",
+        "fabpot/goutte": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Opportus\\WebScraper\\": "src/"
+        }
+    }
+}
