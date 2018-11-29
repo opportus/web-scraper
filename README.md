@@ -4,6 +4,12 @@ A web scraper taking as arguments a list of URLs and a list of XPath queries to 
 
 Wraps [FriendsOfPHP/Goutte](https://github.com/FriendsOfPHP/Goutte).
 
+## Installation
+
+```bash
+$ composer require opportus/web-scraper
+```
+
 ## Usage
 
 ```php
