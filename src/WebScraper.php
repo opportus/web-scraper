@@ -70,19 +70,21 @@ final class WebScraper implements WebScraperInterface
                 }
 
                 foreach ($queryResults as $queryResult) {
+                    // Serializes the query result if it is a node...
                     if (\is_object($queryResult) && $queryResult instanceof \DOMNode) {
                         if ($queryResult instanceof \DOMCharacterData) {
-                            $result = $queryResult->nodeValue;
+                            $queryResult = $queryResult->nodeValue;
                         } else {
-                            $result = '';
-                            foreach ($queryResult->childNodes as $childNode) {
-                                $result .= $childNode->ownerDocument->saveXml($childNode);
+                            $childNodes = $queryResult->childNodes;
+                            $queryResult = '';
+                            foreach ($childNodes as $childNode) {
+                                $queryResult .= $childNode->ownerDocument->saveXml($childNode);
                             }
                         }
                     }
 
                     // Adds the query result to the data...
-                    $data->addQueryResult((string)$documentId, (string)$queryId, $result);
+                    $data->addQueryResult((string)$documentId, (string)$queryId, $queryResult);
                 }
             }
         }
