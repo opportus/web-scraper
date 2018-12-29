@@ -7,7 +7,7 @@ use Goutte\Client as HttpClient;
 /**
  * The web scraper.
  *
- * @version 1.0.0
+ * @version 2.0.0
  * @package Opportus\WebScraper
  * @author  Clément Cazaud <opportus@gmail.com>
  * @license https://github.com/opportus/web-scraper/blob/master/LICENSE MIT
@@ -17,13 +17,14 @@ final class WebScraper implements WebScraperInterface
     /**
      * {@inheritdoc}
      */
-    public function scrap(array $urls, array $queries) : DataInterface
+    public function scrap(array $uris, array $queries) : DataInterface
     {
-        $this->validateUrls($urls);
+        $this->validateUris($uris);
         $this->validateQueries($queries);
 
-        // Prepares data to be returned...
-        $data = new Data();
+        $uris = \array_combine($uris, $uris);
+        $queries = \array_combine($queries, $queries);
+        $data = array();
 
         try {
             // Prepares the HTTP client to fetch documents...
@@ -39,10 +40,10 @@ final class WebScraper implements WebScraperInterface
             );
         }
 
-        foreach ($urls as $documentId => $url) {
+        foreach ($uris as $uri) {
             try {
                 // Fetches the document...
-                $domCrawler = $httpClient->request('GET', $url);
+                $domCrawler = $httpClient->request('GET', $uri);
             } catch (\Exception $exception) {
                 throw new InvalidOperationException(
                     \sprintf(
@@ -54,9 +55,9 @@ final class WebScraper implements WebScraperInterface
                 );
             }
 
-            foreach ($queries as $queryId => $query) {
+            foreach ($queries as $query) {
                 try {
-                    //Performs the XPath query on the current document...
+                    // Performs the XPath query on the current document...
                     $queryResults = $domCrawler->evaluate($query);
                 } catch (\Exception $exception) {
                     throw new InvalidOperationException(
@@ -68,6 +69,8 @@ final class WebScraper implements WebScraperInterface
                         $exception
                     );
                 }
+
+                $serializedQueryResults = array();
 
                 foreach ($queryResults as $queryResult) {
                     // Serializes the query result if it is a node...
@@ -83,33 +86,34 @@ final class WebScraper implements WebScraperInterface
                         }
                     }
 
-                    // Adds the query result to the data...
-                    $data->addQueryResult((string)$documentId, (string)$queryId, $queryResult);
+                    $serializedQueryResults[] = $queryResult;
                 }
+
+                $data[$uri][$query] = $serializedQueryResults;
             }
         }
 
-        return $data;
+        return new Data($data);
     }
 
     /**
      * Validates URLs.
      *
-     * @param array $urls
+     * @param array $uris
      * @throws Opportus\WebScraper\InvalidArgumentException If the argument is empty or contains anything else than valid URLs
      */
-    private function validateUrls(array $urls)
+    private function validateUris(array $uris)
     {
-        if (empty($urls)) {
-            throw new InvalidArgumentException('Invalid "urls" argument: expecting it to contain valid URLs, got none');
+        if (empty($uris)) {
+            throw new InvalidArgumentException('Invalid "uris" argument: expecting it to contain valid URIs, got none');
         }
 
-        foreach ($urls as $url) {
-            if (false === \filter_var($url, \FILTER_VALIDATE_URL)) {
+        foreach ($uris as $uri) {
+            if (false === \filter_var($uri, \FILTER_VALIDATE_URL)) {
                 throw new InvalidArgumentException(
                     \sprintf(
-                        'Invalid "urls" argument: expecting it to contain valid URLs, got "%s"',
-                        $url
+                        'Invalid "uris" argument: expecting it to contain valid URIs, got "%s"',
+                        $uri
                     )
                 );
             }

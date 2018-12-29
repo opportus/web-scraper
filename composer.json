@@ -1,6 +1,6 @@
 {
     "name": "opportus/web-scraper",
-    "description": "A web scraper taking as arguments a list of URLs and a list of XPath queries to perform on each document.",
+    "description": "A web scraper taking as arguments a list of URIs and a list of XPath queries to perform on each document. Returns an instance of DataInterface.",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -11,7 +11,7 @@
     ],
     "require": {
 		"php": "^7.2",
-        "fabpot/goutte": "^3.2"
+        "fabpot/goutte": "^4.1"
     },
     "autoload": {
         "psr-4": {
